@@ -35,3 +35,6 @@ Route::post('/store_orangtua', [DashboardClient::class, 'storeOrtu']);
 Route::get('/identitas_ortu/{id}/edit', [DashboardClient::class, 'IdentitasOrtuEdit']);
 Route::put('/identitas_ortu/{id}', [DashboardClient::class, 'updateIdentitasOrtu']);
 Route::delete('/identitas_ortu/{id}', [DashboardClient::class, 'destroyIdentitasOrtu']);
+
+Route::get('/periodik_siswa', [DashboardClient::class, 'periodikSiswa']);
+Route::post('/store_periodik', [DashboardClient::class, 'storePeriodikSiswa']);

@@ -62,14 +62,16 @@
             <div class="form-group col-md-4">
               <label for="status_anak_ke">Anak Ke-</label>
               <select class="form-control" name="status_anak_ke" value="{{$get_data_siswa->status_anak_ke}}" id="status_anak_ke">
-                @for($i=0;$i<8;$i++) <option value="{{$i+1}}">{{$i+1}}</option>
+                @for($i=0;$i<8;$i++)
+                <option value="{{$get_data_siswa->status_anak_ke == $i+1 ? $get_data_siswa->status_anak_ke : $i+1}}" {{$get_data_siswa->status_anak_ke == $i+1 ? 'selected':''}}>{{$i+1}}</option>
                   @endfor
               </select>
             </div>
             <div class="form-group col-md-4">
               <label for="usia_siswa">Usia Siswa</label>
               <select class="form-control" name="usia_siswa" value="{{$get_data_siswa->usia_siswa}}" id="usia_siswa">
-                @for($i=0;$i<8;$i++) <option value="{{$i+1}}">{{$i+1}} Tahun</option>
+                @for($i=0;$i < 8;$i++) 
+                <option value="{{$get_data_siswa->usia_siswa == $i+1 ? $get_data_siswa->usia_siswa : $i+1}}" {{$get_data_siswa->usia_siswa == $i+1 ? 'selected':''}}>{{$i+1}} Tahun</option>
                   @endfor
               </select>
             </div>

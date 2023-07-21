@@ -58,6 +58,19 @@ class DashboardClient extends Controller
             ]
         );
     }
+    public function periodikSiswa()
+    {
+        $id_user = Auth::user()->id;
+        $periodik_siswa = DB::table('tb_identitas_siswa')->leftJoin('tb_periodik_siswa', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_periodik_siswa.identitas_siswa_id')->where('tb_identitas_siswa.user_id', $id_user)->get();
+        $pilihan_jarak = ['kurang dari 1km', '1 - 2km', '2 - 5km', '5 - 10km', 'lebih dari 10km'];
+        return view(
+            'client.periodik_siswa',
+            [
+                'pilihan_jarak' => $pilihan_jarak,
+                'periodik_siswa' =>  $periodik_siswa,
+            ]
+        );
+    }
 
     public function storeIdentitasSiswa(Request $request)
     {
@@ -155,6 +168,41 @@ class DashboardClient extends Controller
             return redirect('identitas_ortu')->with('success', 'Data berhasil di tambahkan');
         } catch (\Exception $e) {
             return redirect('identitas_ortu')->with('failed', 'Terjadi kesalahan' . $e->getMessage());
+        }
+    }
+    public function storePeriodikSiswa(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'tinggi_badan_siswa' => 'required',
+                'berat_badan_siswa' => 'required',
+                'jarak_tempuh_siswa' => 'required',
+                'jumlah_saudara_siswa' => 'required',
+            ],
+            [
+                'tinggi_badan_siswa.required' => 'Tinggi badan siswa harus diisi',
+                'berat_badan_siswa.required' => 'Berat badan siswa harus diisi',
+                'jarak_tempuh_siswa.required' => 'Jarak tempuh siswa harus diisi',
+                'jumlah_saudara_siswa.required' => 'Jumlah saudara siswa harus diisi',
+            ]
+        );
+        if ($validator->fails()) {
+            return redirect('periodik_siswa')->withErrors($validator)->with('failed', 'terjadi kesalahan');
+        } else {
+            $id_user = Auth::user()->id;
+            $id_siswa = DB::table('tb_identitas_siswa')->select('id_identitas_siswa')->where('user_id', $id_user)->first();
+            DB::table('tb_periodik_siswa')->insert([
+                'user_id' => $id_user,
+                'identitas_siswa_id' => $id_siswa->id_identitas_siswa,
+                'tinggi_badan_siswa' => $request->tinggi_badan_siswa,
+                'berat_badan_siswa' => $request->berat_badan_siswa,
+                'jarak_tempuh_siswa' => $request->jarak_tempuh_siswa,
+                'jumlah_saudara_siswa' => $request->jumlah_saudara_siswa,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            ]);
+            return redirect('periodik_siswa')->with('success', 'Data berhasil ditambahkan');
         }
     }
 
@@ -332,7 +380,7 @@ class DashboardClient extends Controller
             return redirect('identitas_siswa')->with('success', 'Data Berhasil Dihapus');
         } catch (\Exception $e) {
 
-            return redirect('identitas_siswa')->with('failed', 'Data Berhasil Dihapus' . $e->getMessage());
+            return redirect('identitas_siswa')->with('failed', 'Terjadi Kesalahan');
         }
     }
     public function destroyIdentitasOrtu($id)
