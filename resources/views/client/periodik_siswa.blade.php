@@ -90,7 +90,7 @@
                         <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>
                         @else
                         <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>
-                      <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Next</a>
+                      <a href="{{url('/register_siswa')}}" class="btn btn-primary">Next</a>
                           
                       @endif
              

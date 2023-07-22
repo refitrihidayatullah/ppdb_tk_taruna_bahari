@@ -41,3 +41,6 @@ Route::post('/store_periodik', [DashboardClient::class, 'storePeriodikSiswa']);
 Route::get('/periodik_siswa/{id}/edit', [DashboardClient::class, 'periodikSiswaEdit']);
 Route::put('/periodik_siswa/{id}', [DashboardClient::class, 'updatePeriodikSiswa']);
 Route::delete('/periodik_siswa/{id}', [DashboardClient::class, 'destroyPeriodikSiswa']);
+
+Route::get('/register_siswa', [DashboardClient::class, 'registerSiswa']);
+Route::post('/store_registerSiswa', [DashboardClient::class, 'storeRegistrasiSiswa']);

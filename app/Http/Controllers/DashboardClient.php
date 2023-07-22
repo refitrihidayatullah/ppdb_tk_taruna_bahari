@@ -73,6 +73,24 @@ class DashboardClient extends Controller
             ]
         );
     }
+    public function registerSiswa()
+    {
+        $id_user = Auth::user()->id;
+        $count_register = DB::table('tb_register_siswa')->where('user_id', $id_user)->count();
+        $pilihan_rombel = ['TK A - (4-5 tahun)', 'TK B (5-6 tahun)'];
+        $pilihan_pendaftaran = ['Siswa Baru', 'Pindahan', 'Sekolah Lagi'];
+        $register_siswa = DB::table('tb_identitas_siswa')->leftJoin('tb_register_siswa', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_register_siswa.identitas_siswa_id')->where('tb_register_siswa.user_id', $id_user)->get();
+
+        return view(
+            'client.register_siswa',
+            [
+                'pilihan_rombel' => $pilihan_rombel,
+                'pilihan_pendaftaran' => $pilihan_pendaftaran,
+                'register_siswa' => $register_siswa,
+                'count_register' => $count_register,
+            ]
+        );
+    }
 
     public function storeIdentitasSiswa(Request $request)
     {
@@ -208,6 +226,40 @@ class DashboardClient extends Controller
                 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]);
             return redirect('periodik_siswa')->with('success', 'Data berhasil ditambahkan');
+        }
+    }
+    public function storeRegistrasiSiswa(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'tanggal_pendaftaran_siswa' => 'required',
+                    'masuk_rombel_siswa' => 'required',
+                    'jenis_pendaftaran_siswa' => 'required',
+                ],
+                [
+                    'tanggal_pendaftaran_siswa.required' => 'Tanggal pendaftaran harus diisi',
+                    'masuk_rombel_siswa.required' => 'rombel siswa harus diisi',
+                    'jenis_pendaftaran_siswa.required' => 'jenis pendaftaran siswa harus diisi',
+                ]
+            );
+            $id_user = Auth::user()->id;
+            $id_siswa = DB::table('tb_identitas_siswa')->where('user_id', $id_user)->first();
+            $id_ortu = DB::table('tb_identitas_orangtua')->where('user_id', $id_user)->first();
+            DB::table('tb_register_siswa')->insert([
+                'user_id' => $id_user,
+                'identitas_siswa_id' => $id_siswa->id_identitas_siswa,
+                'identitas_orangtua_id' => $id_ortu->id_identitas_orangtua,
+                'tanggal_pendaftaran_siswa' => $request->tanggal_pendaftaran_siswa,
+                'masuk_rombel_siswa' => $request->masuk_rombel_siswa,
+                'jenis_pendaftaran' => $request->jenis_pendaftaran,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            ]);
+            return redirect('register_siswa')->with('success', 'data berhasil ditambahkan');
+        } catch (\Exception $e) {
+            return redirect('register_siswa')->withErrors($validator)->with('failed', 'Terjadi kesalahan' . $e->getMessage());
         }
     }
 
