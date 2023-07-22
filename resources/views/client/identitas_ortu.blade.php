@@ -118,7 +118,10 @@
                     </div>
              
              
-                        @if ($count_ortu <= "1")
+                        @if($count_ortu == null)
+                        <button type="submit" class="btn btn-primary">Kirim</button>  
+                        <a href="{{url('/register_siswa')}}" class="btn btn-primary">Back</a>  
+                        @elseif($count_ortu <= "1")
                         <button type="submit" class="btn btn-primary">Kirim</button>  
                         <a href="{{url('/identitas_siswa')}}" class="btn btn-primary">Back</a>  
                         <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Next</a>

@@ -38,3 +38,6 @@ Route::delete('/identitas_ortu/{id}', [DashboardClient::class, 'destroyIdentitas
 
 Route::get('/periodik_siswa', [DashboardClient::class, 'periodikSiswa']);
 Route::post('/store_periodik', [DashboardClient::class, 'storePeriodikSiswa']);
+Route::get('/periodik_siswa/{id}/edit', [DashboardClient::class, 'periodikSiswaEdit']);
+Route::put('/periodik_siswa/{id}', [DashboardClient::class, 'updatePeriodikSiswa']);
+Route::delete('/periodik_siswa/{id}', [DashboardClient::class, 'destroyPeriodikSiswa']);

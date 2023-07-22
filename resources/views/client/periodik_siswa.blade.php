@@ -84,12 +84,18 @@
                            @enderror
                         </div>
                     </div>
-             
+
+                      @if ($count_periodik  < 1)
+                      <button type="submit" class="btn btn-primary">Kirim</button>  
+                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>
+                        @else
+                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>
+                      <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Next</a>
+                          
+                      @endif
              
                     
-                        <button type="submit" class="btn btn-primary">Kirim</button>  
-                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>  
-                        <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Next</a>
+                          
              
                         
                       
@@ -132,29 +138,44 @@
               @foreach ( $periodik_siswa as $siswa)
                   
               <tr>
-                <td>{{$loop->iteration ??''}}</td>
-                <td>{{$siswa->nama_lengkap_siswa ?? ''}}</td>
-                <td>{{$siswa->tinggi_badan_siswa.'cm'  ?? ''}}</td>
-                <td>{{$siswa->berat_badan_siswa .'kg'?? ''}}</td>
+                <td>{{$siswa->id_periodik_siswa == null ?'':$loop->iteration}}</td>
+                <td>{{$siswa->id_periodik_siswa == null ?'':$siswa->nama_lengkap_siswa}}</td>
+                @if ($siswa->tinggi_badan_siswa == null)
+                   <td></td> 
+                @else
+                  <td> {{$siswa->tinggi_badan_siswa." cm"}}</td> 
+                @endif
+                @if ($siswa->berat_badan_siswa == null)
+                <td></td> 
+             @else
+               <td> {{$siswa->berat_badan_siswa." kg"}}</td> 
+             @endif
                 <td>{{$siswa->jarak_tempuh_siswa ?? ''}}</td>
-                <td>{{$siswa->jumlah_saudara_siswa.' saudara' ?? ''}}</td>
+                @if ($siswa->jumlah_saudara_siswa == null)
+                <td></td> 
+             @else
+               <td> {{$siswa->jumlah_saudara_siswa." saudara"}}</td> 
+             @endif
               
-             
-                  <td>
-                    <div class="d-flex justify-content-around">
-                      <a href="{{url("/periodik_siswa/edit")}}">
-                        <span class="icon text-dark-50">
-                          <i class="fas fa-pen"></i>
-                        </span>
-                      </a>
-                      
-                      <a href="#" data-toggle="modal" data-target="#delete_periodik_siswa_Modal">
-                        <span class="icon text-dark-50">
-                          <i class="fas fa-trash"></i>
-                        </span>
-                      </a>
-                    </div>
-                  </td>
+             @if (is_null($siswa->id_periodik_siswa))
+                 <td></td>
+             @else
+             <td>
+               <div class="d-flex justify-content-around">
+                 <a href="{{url("/periodik_siswa/".$siswa->id_periodik_siswa."/edit")}}">
+                   <span class="icon text-dark-50">
+                     <i class="fas fa-pen"></i>
+                   </span>
+                 </a>
+                 
+                 <a href="#" data-toggle="modal" data-target="#delete_periodik_siswa_Modal{{$siswa->id_periodik_siswa}}">
+                   <span class="icon text-dark-50">
+                     <i class="fas fa-trash"></i>
+                   </span>
+                 </a>
+               </div>
+             </td>
+             @endif
                   
                 </tr>
                 @endforeach
@@ -179,7 +200,8 @@
     
 
  <!-- Modal delete identitas siswa -->
- <div class="modal fade" id="delete_periodik_siswa_Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+ @foreach ( $periodik_siswa as $siswa)
+ <div class="modal fade" id="delete_periodik_siswa_Modal{{$siswa->id_periodik_siswa}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -189,7 +211,7 @@
         </button>
       </div>
       <div class="modal-body">
-          <form action="{{url("identitas_priodik/")}}" method="POST">
+          <form action="{{url("periodik_siswa/".$siswa->id_periodik_siswa)}}" method="POST">
               @csrf
               @method('delete')
               <h5>Yakin Akan Menghapus Data?</h5>
@@ -202,6 +224,7 @@
     </div>
   </div>
 </div>
+@endforeach
 
 
 

@@ -18,12 +18,16 @@ return new class extends Migration
             $table->id('id_periodik_siswa');
             $table->unsignedBigInteger('identitas_siswa_id');
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('identitas_orangtua_id')->nullable();
             $table->string('tinggi_badan_siswa', 3);
             $table->string('berat_badan_siswa', 3);
             $table->string('jarak_tempuh_siswa');
             $table->string('jumlah_saudara_siswa', 2);
 
             $table->foreign('identitas_siswa_id')->references('id_identitas_siswa')->on('tb_identitas_siswa')->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('identitas_orangtua_id')->references('id_identitas_orangtua')->on('tb_identitas_orangtua')->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->constrained()

@@ -61,6 +61,7 @@ class DashboardClient extends Controller
     public function periodikSiswa()
     {
         $id_user = Auth::user()->id;
+        $count_periodik = DB::table('tb_periodik_siswa')->where('user_id', $id_user)->count();
         $periodik_siswa = DB::table('tb_identitas_siswa')->leftJoin('tb_periodik_siswa', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_periodik_siswa.identitas_siswa_id')->where('tb_identitas_siswa.user_id', $id_user)->get();
         $pilihan_jarak = ['kurang dari 1km', '1 - 2km', '2 - 5km', '5 - 10km', 'lebih dari 10km'];
         return view(
@@ -68,6 +69,7 @@ class DashboardClient extends Controller
             [
                 'pilihan_jarak' => $pilihan_jarak,
                 'periodik_siswa' =>  $periodik_siswa,
+                'count_periodik' => $count_periodik,
             ]
         );
     }
@@ -192,9 +194,12 @@ class DashboardClient extends Controller
         } else {
             $id_user = Auth::user()->id;
             $id_siswa = DB::table('tb_identitas_siswa')->select('id_identitas_siswa')->where('user_id', $id_user)->first();
+            $id_ortu = DB::table('tb_identitas_orangtua')->select('id_identitas_orangtua')->where('user_id', $id_user)->first();
+
             DB::table('tb_periodik_siswa')->insert([
                 'user_id' => $id_user,
                 'identitas_siswa_id' => $id_siswa->id_identitas_siswa,
+                'identitas_orangtua_id' => $id_ortu->id_identitas_orangtua,
                 'tinggi_badan_siswa' => $request->tinggi_badan_siswa,
                 'berat_badan_siswa' => $request->berat_badan_siswa,
                 'jarak_tempuh_siswa' => $request->jarak_tempuh_siswa,
@@ -268,6 +273,20 @@ class DashboardClient extends Controller
         $pilihan_pekerjaan = ['PNS', 'Pengusaha', 'Karyawan Swasta', 'Wiraswasta', 'Sopir', 'Guru/Dosen', 'Dokter', 'Pensiunan', 'Programmer', 'Lainnya'];
         $get_data_ortu = DB::table('tb_identitas_orangtua')->where('id_identitas_orangtua', $id)->first();
         return view('client.edit_identitas_ortu', ['get_data_ortu' => $get_data_ortu, 'pilihan_pendidikan' => $pilihan_pendidikan, 'pilihan_pekerjaan' => $pilihan_pekerjaan]);
+    }
+    public function periodikSiswaEdit($id)
+    {
+        $id_user = Auth::user()->id;
+        $pilihan_jarak = ['kurang dari 1km', '1 - 2km', '2 - 5km', '5 - 10km', 'lebih dari 10km'];
+        $get_data_periodik = DB::table('tb_identitas_siswa')->leftJoin('tb_periodik_siswa', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_periodik_siswa.identitas_siswa_id')->where('tb_periodik_siswa.user_id', $id_user)->first();
+
+        return view(
+            'client.edit_periodik_siswa',
+            [
+                'pilihan_jarak' => $pilihan_jarak,
+                'get_data_periodik' => $get_data_periodik,
+            ]
+        );
     }
     /**
      * Update the specified resource in storage.
@@ -366,6 +385,38 @@ class DashboardClient extends Controller
             return redirect('identitas_ortu')->with('success', 'Data Berhasil Diupdate');
         }
     }
+    public function updatePeriodikSiswa(Request $request, $id)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'tinggi_badan_siswa' => 'required',
+                'berat_badan_siswa' => 'required',
+                'jarak_tempuh_siswa' => 'required',
+                'jumlah_saudara_siswa' => 'required',
+            ],
+            [
+                'tinggi_badan_siswa.required' => 'Tinggi badan siswa harus diisi',
+                'berat_badan_siswa.required' => 'Berat badan siswa harus diisi',
+                'jarak_tempuh_siswa.required' => 'Jarak tempuh siswa harus diisi',
+                'jumlah_saudara_siswa.required' => 'Jumlah saudara siswa harus diisi',
+            ]
+        );
+        if ($validator->fails()) {
+            return redirect('periodik_siswa')->with('failed', 'Terjadi Kesalahan');
+        } else {
+            DB::table('tb_periodik_siswa')->where('id_periodik_siswa', $id)->update(
+                [
+                    'tinggi_badan_siswa' => $request->tinggi_badan_siswa,
+                    'berat_badan_siswa' => $request->berat_badan_siswa,
+                    'jarak_tempuh_siswa' => $request->jarak_tempuh_siswa,
+                    'jumlah_saudara_siswa' => $request->jumlah_saudara_siswa,
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ]
+            );
+            return redirect('periodik_siswa')->with('success', 'Data berhasil diupdate');
+        }
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -385,7 +436,14 @@ class DashboardClient extends Controller
     }
     public function destroyIdentitasOrtu($id)
     {
+
         DB::table('tb_identitas_orangtua')->where('id_identitas_orangtua', $id)->delete();
+
         return redirect('identitas_ortu')->with('success', 'Data Berhasil didelete');
+    }
+    public function destroyPeriodikSiswa($id)
+    {
+        DB::table('tb_periodik_siswa')->where('id_periodik_siswa', $id)->delete();
+        return redirect('periodik_siswa')->with('success', 'data berhasil dihapus');
     }
 }
