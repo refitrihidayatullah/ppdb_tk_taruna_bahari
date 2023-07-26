@@ -88,9 +88,9 @@
              
              
                     
-                        <button type="submit" class="btn btn-primary">Kirim</button>  
-                        <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Back</a>  
-                        <a href="{{url('/register_siswa')}}" class="btn btn-primary">Next</a>
+                        <button type="submit" class="btn btn-primary">Update</button>  
+                        <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Kembali</a>  
+                       
              
                         
                       

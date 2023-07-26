@@ -83,16 +83,21 @@
  
                     </div>
 
-         
+                    @if ($count_register < 1)
+                    <button type="submit" class="btn btn-primary">Kirim</button>  
+                    <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Kembali</a>
+                    
+                    @else
+                    <a href="{{url('/dashboard')}}" class="btn btn-success">Selesai</a>
+                        
+                    @endif
 
-                      <button type="submit" class="btn btn-primary">Kirim</button>  
-                        <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Back</a>
-                      <a href="{{url('/dashboard')}}" class="btn btn-success">Selesai</a>
 
              
                     
                           
              
+
                         
                       
 
@@ -149,13 +154,13 @@
                    @else
                    <td>
                      <div class="d-flex justify-content-around">
-                       <a href="{{url("/register_siswa/edit")}}">
+                       <a href="{{url("/register_siswa/".$register->id_register_siswa."/edit")}}">
                         <span class="icon text-dark-50">
                           <i class="fas fa-pen"></i>
                         </span>
                       </a>
                       
-                      <a href="#" data-toggle="modal" data-target="#delete_register_siswa_Modal">
+                      <a href="#" data-toggle="modal" data-target="#delete_register_siswa_Modal{{$register->id_register_siswa}}">
                         <span class="icon text-dark-50">
                           <i class="fas fa-trash"></i>
                         </span>
@@ -189,8 +194,8 @@
     
 
  <!-- Modal delete identitas siswa -->
-
- <div class="modal fade" id="delete_register_siswa_Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+ @foreach ($register_siswa as $register)
+ <div class="modal fade" id="delete_register_siswa_Modal{{$register->id_register_siswa}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -200,7 +205,7 @@
         </button>
       </div>
       <div class="modal-body">
-          <form action="{{url("register_siswa/")}}" method="POST">
+          <form action="{{url("register_siswa/".$register->id_register_siswa)}}" method="POST">
               @csrf
               @method('delete')
               <h5>Yakin Akan Menghapus Data?</h5>
@@ -213,7 +218,7 @@
     </div>
   </div>
 </div>
-
+@endforeach
 
 
 

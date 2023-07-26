@@ -42,16 +42,21 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
+            @if (Auth::user()->role == 0)
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url('/dashboard_admin')}}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard Admin</span></a>
+            </li>
+            @else
             <li class="nav-item active">
                 <a class="nav-link" href="{{url('/dashboard')}}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard client</span></a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{url('/dashboard-admin')}}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard Admin</span></a>
-            </li>
+            
+            @endif
+           
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -62,10 +67,23 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
+            @if (Auth::user()->role == 0)
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseValidasiSiswa" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Data Registrasi</span>
+                </a>
+                <div id="collapseValidasiSiswa" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{{url('/validasi_siswa')}}">Validasi Register</a>
+                    </div>
+                </div>
+            </li>  
+            @else
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseIndentitasSiswa" aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Identitas Siswa</span>
+                    <span>Registrasi Siswa</span>
                 </a>
                 <div id="collapseIndentitasSiswa" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
@@ -73,68 +91,11 @@
                     </div>
                 </div>
             </li>
+            @endif
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Indentitas Ortu
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseIndentitasOrtu" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Identitas Ortu</span>
-                </a>
-                <div id="collapseIndentitasOrtu" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{url('/identitas_ortu')}}">Identitas Ortu</a>
-                    </div>
-                </div>
-            </li>
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Periodik Siswa
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePeriodikSiswa" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Periodik Siswa</span>
-                </a>
-                <div id="collapsePeriodikSiswa" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{url('/periodik_siswa')}}">Periodik Siswa</a>
-                    </div>
-                </div>
-            </li>
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Register Siswa
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRegisterSiswa" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Register Siswa</span>
-                </a>
-                <div id="collapseRegisterSiswa" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{url('/register_siswa')}}">Register Siswa</a>
-                    </div>
-                </div>
-            </li>
-
+            <a href="{{url('logout')}}" class="btn btn-primary">Logout</a>
 
 
         </ul>

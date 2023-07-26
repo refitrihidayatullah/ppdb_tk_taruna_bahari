@@ -17,7 +17,25 @@ class DashboardClient extends Controller
      */
     public function index()
     {
-        return view('client.dashboard');
+        $id_user = Auth::user()->id;
+
+        $status_identitas_siswa = DB::table('tb_identitas_siswa')->where('user_id', $id_user)->count();
+        $status_identitas_orangtua = DB::table('tb_identitas_orangtua')->where('user_id', $id_user)->count();
+        $status_periodik_siswa = DB::table('tb_periodik_siswa')->where('user_id', $id_user)->count();
+        $status_register_siswa = DB::table('tb_register_siswa')->where('user_id', $id_user)->count();
+        $status_verifikasi = DB::table('tb_identitas_siswa')->select('is_active')->where('user_id', $id_user)->first();
+
+
+        return view(
+            'client.dashboard',
+            [
+                'status_identitas_siswa' => $status_identitas_siswa,
+                'status_identitas_orangtua' => $status_identitas_orangtua,
+                'status_periodik_siswa' => $status_periodik_siswa,
+                'status_register_siswa' => $status_register_siswa,
+                'status_verifikasi' => $status_verifikasi,
+            ]
+        );
     }
 
     public function identitasSiswa()
@@ -40,14 +58,17 @@ class DashboardClient extends Controller
 
     function identitasOrtu()
     {
-        $id_siswa = Auth::user()->id;
+        $id_user = Auth::user()->id;
 
 
-        $count_ortu = DB::table('tb_identitas_orangtua')->where('user_id', $id_siswa)->count();
+        $count_ortu = DB::table('tb_identitas_orangtua')->where('user_id', $id_user)->count();
 
-        $identitas_ortu = DB::table('tb_identitas_siswa')->leftjoin('tb_identitas_orangtua', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_identitas_orangtua.identitas_siswa_id')->where('tb_identitas_siswa.user_id', $id_siswa)->get();
+        $identitas_ortu = DB::table('tb_identitas_siswa')->leftJoin('tb_identitas_orangtua', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_identitas_orangtua.identitas_siswa_id')->leftJoin('tb_identitas_orangtua_dua', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_identitas_orangtua_dua.identitas_siswa_id')->where('tb_identitas_siswa.user_id', $id_user)->get();
         $pilihan_pendidikan = ['SD', 'SMP', 'SMA', 'D1', 'D2', 'D3', 'D4', 'S1', 'S2', 'S3'];
         $pilihan_pekerjaan = ['PNS', 'Pengusaha', 'Karyawan Swasta', 'Wiraswasta', 'Sopir', 'Guru/Dosen', 'Dokter', 'Pensiunan', 'Programmer', 'Lainnya'];
+        $cek_ortu1 = DB::table('tb_identitas_orangtua')->where('user_id', $id_user)->count();
+        $cek_ortu2 = DB::table('tb_identitas_orangtua_dua')->where('user_id', $id_user)->select('nama_orangtua_dua')->first();
+        // dd($cek_ortu2);
         return view(
             'client.identitas_ortu',
             [
@@ -55,6 +76,8 @@ class DashboardClient extends Controller
                 'count_ortu' => $count_ortu,
                 'pilihan_pendidikan' => $pilihan_pendidikan,
                 'pilihan_pekerjaan' => $pilihan_pekerjaan,
+                'cek_ortu1' => $cek_ortu1,
+                'cek_ortu2' => $cek_ortu2,
             ]
         );
     }
@@ -147,6 +170,7 @@ class DashboardClient extends Controller
     public function storeOrtu(Request $request)
     {
         try {
+            DB::beginTransaction();
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -170,21 +194,44 @@ class DashboardClient extends Controller
             if ($validator->fails()) {
                 return redirect('identitas_ortu')->withErrors($validator)->with('failed', 'Terjadi kesalahan');
             }
-            $id_siswa = Auth::user()->id;
-            $get_id_siswa = DB::table('tb_identitas_siswa')->select('id_identitas_siswa')->where('user_id', $id_siswa)->first();
+            $id_user = Auth::user()->id;
+            $get_id_siswa = DB::table('tb_identitas_siswa')->select('id_identitas_siswa')->where('user_id', $id_user)->first();
 
-            DB::table('tb_identitas_orangtua')->insert([
-                'identitas_siswa_id' => $get_id_siswa->id_identitas_siswa,
-                'user_id' => $id_siswa,
-                'nama_orangtua' => $request->nama_orangtua,
-                'status_orangtua' => $request->status_orangtua,
-                'nik_orangtua' => $request->nik_orangtua,
-                'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
-                'pendidikan_orangtua' => $request->pendidikan_orangtua,
-                'pekerjaan_orangtua' => $request->pekerjaan_orangtua,
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            ]);
+            if ($request->status_orangtua == 1) {
+                $id_ortu =  DB::table('tb_identitas_orangtua')->insertGetId([
+                    'identitas_siswa_id' => $get_id_siswa->id_identitas_siswa,
+                    'user_id' => $id_user,
+                    'nama_orangtua' => $request->nama_orangtua,
+                    'status_orangtua' => $request->status_orangtua,
+                    'nik_orangtua' => $request->nik_orangtua,
+                    'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
+                    'pendidikan_orangtua' => $request->pendidikan_orangtua,
+                    'pekerjaan_orangtua' => $request->pekerjaan_orangtua,
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ]);
+                DB::table('tb_identitas_orangtua_dua')->insert([
+                    'identitas_siswa_id' => $get_id_siswa->id_identitas_siswa,
+                    'identitas_orangtua_id' => $id_ortu,
+                    'user_id' => $id_user,
+                    'status_orangtua_dua' => 2,
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ]);
+            } else {
+
+                DB::table('tb_identitas_orangtua_dua')->update([
+                    'nama_orangtua_dua' => $request->nama_orangtua,
+                    'nik_orangtua_dua' => $request->nik_orangtua,
+                    'tanggal_lahir_orangtua_dua' => $request->tanggal_lahir_orangtua,
+                    'pendidikan_orangtua_dua' => $request->pendidikan_orangtua,
+                    'pekerjaan_orangtua_dua' => $request->pekerjaan_orangtua,
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ]);
+            }
+            DB::commit();
+
             return redirect('identitas_ortu')->with('success', 'Data berhasil di tambahkan');
         } catch (\Exception $e) {
             return redirect('identitas_ortu')->with('failed', 'Terjadi kesalahan' . $e->getMessage());
@@ -247,17 +294,19 @@ class DashboardClient extends Controller
             $id_user = Auth::user()->id;
             $id_siswa = DB::table('tb_identitas_siswa')->where('user_id', $id_user)->first();
             $id_ortu = DB::table('tb_identitas_orangtua')->where('user_id', $id_user)->first();
+            $id_periodik = DB::table('tb_periodik_siswa')->where('user_id', $id_user)->first();
             DB::table('tb_register_siswa')->insert([
                 'user_id' => $id_user,
                 'identitas_siswa_id' => $id_siswa->id_identitas_siswa,
                 'identitas_orangtua_id' => $id_ortu->id_identitas_orangtua,
+                'periodik_siswa_id' => $id_periodik->id_periodik_siswa,
                 'tanggal_pendaftaran_siswa' => $request->tanggal_pendaftaran_siswa,
                 'masuk_rombel_siswa' => $request->masuk_rombel_siswa,
                 'jenis_pendaftaran' => $request->jenis_pendaftaran,
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]);
-            return redirect('register_siswa')->with('success', 'data berhasil ditambahkan');
+            return redirect('register_siswa')->with('success', 'data berhasil ditambahkan , Klik selesai untuk menuju halaman dashboard dan silahkan tunggu verifikasi dari admin terima kasih :)');
         } catch (\Exception $e) {
             return redirect('register_siswa')->withErrors($validator)->with('failed', 'Terjadi kesalahan' . $e->getMessage());
         }
@@ -323,20 +372,36 @@ class DashboardClient extends Controller
     {
         $pilihan_pendidikan = ['SD', 'SMP', 'SMA', 'D1', 'D2', 'D3', 'D4', 'S1', 'S2', 'S3'];
         $pilihan_pekerjaan = ['PNS', 'Pengusaha', 'Karyawan Swasta', 'Wiraswasta', 'Sopir', 'Guru/Dosen', 'Dokter', 'Pensiunan', 'Programmer', 'Lainnya'];
-        $get_data_ortu = DB::table('tb_identitas_orangtua')->where('id_identitas_orangtua', $id)->first();
+        $get_data_ortu = DB::table('tb_identitas_orangtua')->leftjoin('tb_identitas_orangtua_dua', 'tb_identitas_orangtua.id_identitas_orangtua', '=', 'tb_identitas_orangtua_dua.identitas_orangtua_id')->where('tb_identitas_orangtua.id_identitas_orangtua', $id)->first();
         return view('client.edit_identitas_ortu', ['get_data_ortu' => $get_data_ortu, 'pilihan_pendidikan' => $pilihan_pendidikan, 'pilihan_pekerjaan' => $pilihan_pekerjaan]);
     }
     public function periodikSiswaEdit($id)
     {
         $id_user = Auth::user()->id;
         $pilihan_jarak = ['kurang dari 1km', '1 - 2km', '2 - 5km', '5 - 10km', 'lebih dari 10km'];
-        $get_data_periodik = DB::table('tb_identitas_siswa')->leftJoin('tb_periodik_siswa', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_periodik_siswa.identitas_siswa_id')->where('tb_periodik_siswa.user_id', $id_user)->first();
+        $get_data_periodik = DB::table('tb_periodik_siswa')->where('user_id', $id_user)->first();
 
         return view(
             'client.edit_periodik_siswa',
             [
                 'pilihan_jarak' => $pilihan_jarak,
                 'get_data_periodik' => $get_data_periodik,
+            ]
+        );
+    }
+    public function registerSiswaEdit(Request $request, $id)
+    {
+        $id_user = Auth::user()->id;
+        $register_siswa = DB::table('tb_register_siswa')->where('user_id', $id_user)->first();
+
+        $pilihan_rombel = ['TK A - (4-5 tahun)', 'TK B (5-6 tahun)'];
+        $pilihan_pendaftaran = ['Siswa Baru', 'Pindahan', 'Sekolah Lagi'];
+        return view(
+            'client.edit_register_siswa',
+            [
+                'pilihan_rombel' => $pilihan_rombel,
+                'register_pendaftaran' => $pilihan_pendaftaran,
+                'register_siswa' => $register_siswa,
             ]
         );
     }
@@ -423,18 +488,35 @@ class DashboardClient extends Controller
         if ($validator->fails()) {
             return redirect('identitas_ortu')->with('failed', 'Terjadi Kesalahan');
         } else {
-            DB::table('tb_identitas_orangtua')->where('id_identitas_orangtua', $id)->update(
-                [
-                    'nama_orangtua' => $request->nama_orangtua,
-                    'status_orangtua' => $request->status_orangtua,
-                    'nik_orangtua' => $request->nik_orangtua,
-                    'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
-                    'pendidikan_orangtua' => $request->pendidikan_orangtua,
-                    'pekerjaan_orangtua' => $request->pekerjaan_orangtua,
-                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                ]
-            );
-            return redirect('identitas_ortu')->with('success', 'Data Berhasil Diupdate');
+            try {
+                DB::beginTransaction();
+                DB::table('tb_identitas_orangtua')->where('id_identitas_orangtua', $id)->update(
+                    [
+                        'nama_orangtua' => $request->nama_orangtua,
+                        'status_orangtua' => $request->status_orangtua,
+                        'nik_orangtua' => $request->nik_orangtua,
+                        'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
+                        'pendidikan_orangtua' => $request->pendidikan_orangtua,
+                        'pekerjaan_orangtua' => $request->pekerjaan_orangtua,
+                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    ]
+                );
+                DB::table('tb_identitas_orangtua_dua')->where('identitas_orangtua_id', $id)->update(
+                    [
+                        'nama_orangtua_dua' => $request->nama_orangtua_dua,
+                        'status_orangtua_dua' => $request->status_orangtua_dua,
+                        'nik_orangtua_dua' => $request->nik_orangtua_dua,
+                        'tanggal_lahir_orangtua_dua' => $request->tanggal_lahir_orangtua_dua,
+                        'pendidikan_orangtua_dua' => $request->pendidikan_orangtua_dua,
+                        'pekerjaan_orangtua_dua' => $request->pekerjaan_orangtua_dua,
+                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    ]
+                );
+                DB::commit();
+                return redirect('identitas_ortu')->with('success', 'Data Berhasil Diupdate');
+            } catch (\Exception $e) {
+                return redirect('identitas_ortu')->with('failed', 'Terjadi Kesalahan');
+            }
         }
     }
     public function updatePeriodikSiswa(Request $request, $id)
@@ -469,6 +551,31 @@ class DashboardClient extends Controller
             return redirect('periodik_siswa')->with('success', 'Data berhasil diupdate');
         }
     }
+    public function update_registerSiswa(Request $request, $id)
+    {
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'masuk_rombel_siswa' => 'required',
+                'jenis_pendaftaran' => 'required',
+            ],
+            [
+                'masuk_rombel_siswa.required' => 'rombel siswa harus diisi',
+                'jenis_pendaftaran.required' => 'jenis pendaftaran siswa harus diisi',
+            ]
+        );
+        if ($validator->fails()) {
+            return redirect('register_siswa')->withErrors($validator)->with('failed', 'Terjadi Kesalahan');
+        } else {
+            DB::table('tb_register_siswa')->where('id_register_siswa', $id)->update([
+                'masuk_rombel_siswa' => $request->masuk_rombel_siswa,
+                'jenis_pendaftaran' => $request->jenis_pendaftaran,
+                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            ]);
+            return redirect('register_siswa')->with('success', 'data berhasil diupdate');
+        }
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -497,5 +604,10 @@ class DashboardClient extends Controller
     {
         DB::table('tb_periodik_siswa')->where('id_periodik_siswa', $id)->delete();
         return redirect('periodik_siswa')->with('success', 'data berhasil dihapus');
+    }
+    public function destory_registerSiswa($id)
+    {
+        DB::table('tb_register_siswa')->where('id_register_siswa', $id)->delete();
+        return redirect('register_siswa')->with('success', 'data berhasil dihapus');
     }
 }

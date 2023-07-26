@@ -82,7 +82,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">Kirim</button>
+          <button type="submit" class="btn btn-primary">Update</button>
           <a href="{{url('/identitas_siswa')}}" class="btn btn-primary">Kembali</a>
 
         </form>

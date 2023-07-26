@@ -29,27 +29,21 @@
                 <form action="{{url('/store_orangtua')}}" method="POST">
                   @csrf
                   <p style="font-size: 12px" class="text-danger mb-1">note: tanda * wajib diisi</p>
-                  <p style="font-size: 12px" class="text-danger mb-1">Silahkan isi data ayah & ibu, atau dapat mengisi data wali</p>
+                  <p style="font-size: 12px" class="text-danger mb-1">Silahkan isi data ayah & ibu</p>
                   <fieldset class="form-group">
                     <div class="row">
                       <legend class="col-form-label col-sm-2 pt-0 ">Pilih Data Diri Orang Tua:*</legend>
                       <div class="col-sm-10">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="status_orangtua" value="1" id="gridRadios1" value="option1" checked>
+                          <input class="form-check-input" type="radio" name="status_orangtua" value="1" id="gridRadios1" value="option1" {{$cek_ortu1 == 1 ?'disabled':''}}>
                           <label class="form-check-label" for="gridRadios1">
                             Data Diri Ayah
                           </label>
                         </div>
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="status_orangtua" value="2" id="gridRadios2" value="option2">
+                          <input class="form-check-input" type="radio" name="status_orangtua" value="2" id="gridRadios2" value="option2"{{$cek_ortu1 == 0 || $cek_ortu2->nama_orangtua_dua != null ?'disabled':''}}>
                           <label class="form-check-label" for="gridRadios2">
                             Data Diri Ibu
-                          </label>
-                        </div>
-                        <div class="form-check disabled">
-                          <input class="form-check-input" type="radio" name="status_orangtua" value="3" id="gridRadios3" value="option3" >
-                          <label class="form-check-label" for="gridRadios3">
-                            Data Diri Wali
                           </label>
                         </div>
                       </div>
@@ -57,7 +51,7 @@
                   </fieldset>
                  
                     <div class="form-group">
-                      <label for="nama_orangtua">Nama Lengkap Ayah/Ibu/Wali*</label>
+                      <label for="nama_orangtua">Nama Lengkap Ayah/Ibu*</label>
                       <input type="text" class="form-control @error('nama_orangtua') is-invalid @enderror" name="nama_orangtua" id="nama_orangtua"  placeholder="masukkan nama orang tua siswa">
                       @error('nama_orangtua')
                       <div class="alert alert-danger" role="alert">
@@ -118,15 +112,11 @@
                     </div>
              
              
-                        @if($count_ortu == null)
+                        @if($count_ortu == null || $cek_ortu2->nama_orangtua_dua == null )
                         <button type="submit" class="btn btn-primary">Kirim</button>  
-                        <a href="{{url('/register_siswa')}}" class="btn btn-primary">Back</a>  
-                        @elseif($count_ortu <= "1")
-                        <button type="submit" class="btn btn-primary">Kirim</button>  
-                        <a href="{{url('/identitas_siswa')}}" class="btn btn-primary">Back</a>  
-                        <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Next</a>
+                        <a href="{{url('/identitas_siswa')}}" class="btn btn-primary">Kembali</a>
                         @else
-                        <a href="{{url('/identitas_siswa')}}" class="btn btn-primary">Back</a> 
+                        <a href="{{url('/identitas_siswa')}}" class="btn btn-primary">Kembali</a> 
                         <a href="{{url('/periodik_siswa')}}" class="btn btn-primary">Next</a>
                         @endif
                         
@@ -159,11 +149,12 @@
                 <tr>
                   <th>No</th>
                   <th>Nama Siswa</th>
-                  <th>Nama OrangTua/Wali</th>
-                  <th>Nik Ortu</th>
-                  <th>Tanggal Lahir</th>
-                  <th>Pendidikan Terakhir</th>
-                  <th>Pekerjaan</th>
+                  <th>Nama Ayah</th>
+                  <th>Nama Ibu</th>
+                  <th>Pendidikan Ayah</th>
+                  <th>Pendidikan Ibu</th>
+                  <th>Pekerjaan Ayah</th>
+                  <th>Pekerjaan Ibu</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -171,21 +162,19 @@
                 
                 @foreach ($identitas_ortu as $ortu)
                 <tr>
-                  <td>{{$loop->iteration}}</td>
+                  <td>{{$ortu->id_identitas_orangtua == null ? '': $loop->iteration}}</td>
                   <td>{{  $ortu->id_identitas_orangtua == null ?'': $ortu->nama_lengkap_siswa  }}</td>
                   <td>{{$ortu->nama_orangtua ?? ''}} 
-                      @if ($ortu->status_orangtua === '1')
                       <span class="badge badge-pill badge-primary">{{ $ortu->status_orangtua ==='1' ? 'Ayah': '' }}</span>
-                      @elseif($ortu->status_orangtua === '2')
-                      <span class="badge badge-pill badge-success">{{ $ortu->status_orangtua ==='2' ? 'Ibu': '' }}</span>
-                      @else
-                      <span class="badge badge-pill badge-info">{{ $ortu->status_orangtua ==='3' ? 'Wali': '' }}</span>
-                      @endif
                   </td>
-                  <td>{{ $ortu->nik_orangtua ?? '' }}</td>
-                  <td>{{ $ortu->tanggal_lahir_orangtua ?? '' }}</td>
-                  <td>{{ $ortu->pendidikan_orangtua ?? '' }}</td>
-                  <td>{{ $ortu->pekerjaan_orangtua }}</td>
+                  <td>{{$ortu->nama_orangtua_dua ?? ''}} 
+                    <span class="badge badge-pill badge-warning">{{ $ortu->status_orangtua_dua ==='2' ? 'Ibu': '' }}</span>
+                </td>
+           
+                  <td>{{  $ortu->pendidikan_orangtua ?? '' }}</td>
+                  <td>{{  $ortu->pendidikan_orangtua_dua ?? '' }}</td>
+                  <td>{{ $ortu->pekerjaan_orangtua ?? '' }}</td>
+                  <td>{{ $ortu->pekerjaan_orangtua_dua ?? '' }}</td>
                   @if (is_null($ortu->id_identitas_orangtua))
                     <td></td>  
                   @else    

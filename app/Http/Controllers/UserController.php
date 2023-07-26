@@ -108,7 +108,11 @@ class UserController extends Controller
         } else {
             $credentials = $request->only('email', 'password');
             if (Auth::attempt($credentials)) {
-                return redirect()->intended('/dashboard');
+                if (Auth::user()->role == 0) {
+                    return redirect()->intended('/dashboard_admin');
+                } else {
+                    return redirect()->intended('/dashboard');
+                }
             } else {
                 return redirect('/')->with('failed', 'email atau password salah');
             }

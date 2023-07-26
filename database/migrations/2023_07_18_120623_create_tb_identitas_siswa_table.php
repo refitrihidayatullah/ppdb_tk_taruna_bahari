@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('status_anak_ke', 2);
             $table->string('usia_siswa', 2);
             $table->string('no_hp');
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->constrained()
                 ->onUpdate('cascade')

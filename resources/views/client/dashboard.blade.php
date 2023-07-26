@@ -17,7 +17,7 @@
         <!-- Approach -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Petunjuk Registrasi</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Petunjuk Registrasi Siswa</h6>
             </div>
             <div class="card-body">
                 <p>1. Silahkan Lakukan pengisian data identitas siswa pada menu identitas siswa. Setelah selesai maka klik button Next</p>
@@ -35,29 +35,71 @@
         <!-- Project Card Example -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Status</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Status Registrasi Siswa</h6>
             </div>
             <div class="card-body">
-                <h4 class="small font-weight-bold">Pengisian identitas Siswa <span class="float-right">20%</span></h4>
+                @if($status_identitas_siswa === 0)
+                <h4 class="small font-weight-bold">Pengisian identitas Siswa <span class="float-right">0%</span></h4>
                 <div class="progress mb-4">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <h4 class="small font-weight-bold">Pengisisan identitas Orang Tua <span class="float-right">40%</span></h4>
+                @else
+                <h4 class="small font-weight-bold">Pengisian identitas Siswa <span class="float-right">Complete!</span></h4>
                 <div class="progress mb-4">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <h4 class="small font-weight-bold">Pengisian Periodik Siswa <span class="float-right">60%</span></h4>
+                @endif
+                @if($status_identitas_orangtua === 0)
+                <h4 class="small font-weight-bold">Pengisisan identitas Orang Tua <span class="float-right">0%</span></h4>
                 <div class="progress mb-4">
-                    <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <h4 class="small font-weight-bold">Pengisisan Register Siswa <span class="float-right">80%</span></h4>
+                @else
+                <h4 class="small font-weight-bold">Pengisisan identitas Orang Tua <span class="float-right">Complete!</span></h4>
                 <div class="progress mb-4">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
+                @endif
+                @if($status_periodik_siswa === 0)
+                <h4 class="small font-weight-bold">Pengisian Periodik Siswa <span class="float-right">0%</span></h4>
+                <div class="progress mb-4">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                @else
+                <h4 class="small font-weight-bold">Pengisian Periodik Siswa <span class="float-right">Complete!</span></h4>
+                <div class="progress mb-4">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                @endif
+                @if($status_register_siswa == 0)
+                <h4 class="small font-weight-bold">Pengisisan Register Siswa <span class="float-right">0%</span></h4>
+                <div class="progress mb-4">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                @else
+                <h4 class="small font-weight-bold">Pengisisan Register Siswa <span class="float-right">Complete!</span></h4>
+                <div class="progress mb-4">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                @endif
+    
+                @if($status_verifikasi == null || $status_verifikasi->is_active === 0 )
+                <h4 class="small font-weight-bold">Status Verifikasi<span class="float-right">0%</span></h4>
+                <div class="progress">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                @elseif( $status_register_siswa == 1 && $status_verifikasi->is_active === 0 )
+                <h4 class="small font-weight-bold">Status Verifikasi<span class="float-right">Menunggu di Verifikasi!</span></h4>
+                <div class="progress">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                @else
                 <h4 class="small font-weight-bold">Status Verifikasi<span class="float-right">Complete!</span></h4>
                 <div class="progress">
                     <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
+                @endif
+                
             </div>
         </div>
 

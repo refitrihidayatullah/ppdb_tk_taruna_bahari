@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardClient;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardAdmin;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,23 +25,34 @@ Route::post('store_register', [UserController::class, 'register_action']);
 Route::post('store_login', [UserController::class, 'login_action']);
 Route::get('logout', [UserController::class, 'logout_action']);
 
-Route::get('/dashboard', [DashboardClient::class, 'index']);
-Route::get('/identitas_siswa', [DashboardClient::class, 'identitasSiswa']);
-Route::get('/identitas_siswa/{id}/edit', [DashboardClient::class, 'identitasSiswaEdit']);
-Route::post('/store_indentitas_siswa', [DashboardClient::class, 'storeIdentitasSiswa']);
-Route::put('/update_indentitas_siswa/{id}', [DashboardClient::class, 'updateIdentitasSiswa']);
-Route::delete('/identitas_siswa/{id}', [DashboardClient::class, 'destroy']);
-Route::get('/identitas_ortu', [DashboardClient::class, 'identitasOrtu']);
-Route::post('/store_orangtua', [DashboardClient::class, 'storeOrtu']);
-Route::get('/identitas_ortu/{id}/edit', [DashboardClient::class, 'IdentitasOrtuEdit']);
-Route::put('/identitas_ortu/{id}', [DashboardClient::class, 'updateIdentitasOrtu']);
-Route::delete('/identitas_ortu/{id}', [DashboardClient::class, 'destroyIdentitasOrtu']);
 
-Route::get('/periodik_siswa', [DashboardClient::class, 'periodikSiswa']);
-Route::post('/store_periodik', [DashboardClient::class, 'storePeriodikSiswa']);
-Route::get('/periodik_siswa/{id}/edit', [DashboardClient::class, 'periodikSiswaEdit']);
-Route::put('/periodik_siswa/{id}', [DashboardClient::class, 'updatePeriodikSiswa']);
-Route::delete('/periodik_siswa/{id}', [DashboardClient::class, 'destroyPeriodikSiswa']);
+Route::middleware(['auth', 'user-auth'])->group(function () {
+    Route::get('/dashboard', [DashboardClient::class, 'index']);
+    Route::get('/identitas_siswa', [DashboardClient::class, 'identitasSiswa']);
+    Route::get('/identitas_siswa/{id}/edit', [DashboardClient::class, 'identitasSiswaEdit']);
+    Route::post('/store_indentitas_siswa', [DashboardClient::class, 'storeIdentitasSiswa']);
+    Route::put('/update_indentitas_siswa/{id}', [DashboardClient::class, 'updateIdentitasSiswa']);
+    Route::delete('/identitas_siswa/{id}', [DashboardClient::class, 'destroy']);
+    Route::get('/identitas_ortu', [DashboardClient::class, 'identitasOrtu']);
+    Route::post('/store_orangtua', [DashboardClient::class, 'storeOrtu']);
+    Route::get('/identitas_ortu/{id}/edit', [DashboardClient::class, 'IdentitasOrtuEdit']);
+    Route::put('/identitas_ortu/{id}', [DashboardClient::class, 'updateIdentitasOrtu']);
+    Route::delete('/identitas_ortu/{id}', [DashboardClient::class, 'destroyIdentitasOrtu']);
 
-Route::get('/register_siswa', [DashboardClient::class, 'registerSiswa']);
-Route::post('/store_registerSiswa', [DashboardClient::class, 'storeRegistrasiSiswa']);
+    Route::get('/periodik_siswa', [DashboardClient::class, 'periodikSiswa']);
+    Route::post('/store_periodik', [DashboardClient::class, 'storePeriodikSiswa']);
+    Route::get('/periodik_siswa/{id}/edit', [DashboardClient::class, 'periodikSiswaEdit']);
+    Route::put('/periodik_siswa/{id}', [DashboardClient::class, 'updatePeriodikSiswa']);
+    Route::delete('/periodik_siswa/{id}', [DashboardClient::class, 'destroyPeriodikSiswa']);
+
+    Route::get('/register_siswa', [DashboardClient::class, 'registerSiswa']);
+    Route::post('/store_registerSiswa', [DashboardClient::class, 'storeRegistrasiSiswa']);
+    Route::get('/register_siswa/{id}/edit', [DashboardClient::class, 'registerSiswaEdit']);
+    Route::put('/register_siswa/{id}', [DashboardClient::class, 'update_registerSiswa']);
+    Route::delete('/register_siswa/{id}', [DashboardClient::class, 'destory_registerSiswa']);
+});
+
+Route::middleware(['auth', 'admin-auth'])->group(function () {
+    Route::get('/dashboard_admin', [DashboardAdmin::class, 'index']);
+    Route::get('/validasi_siswa', [DashboardAdmin::class, 'validasi_siswa']);
+});

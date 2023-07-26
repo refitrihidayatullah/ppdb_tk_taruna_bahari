@@ -87,9 +87,9 @@
 
                       @if ($count_periodik  < 1)
                       <button type="submit" class="btn btn-primary">Kirim</button>  
-                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>
+                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Kembali</a>
                         @else
-                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Back</a>
+                        <a href="{{url('/identitas_ortu')}}" class="btn btn-primary">Kembali</a>
                       <a href="{{url('/register_siswa')}}" class="btn btn-primary">Next</a>
                           
                       @endif
