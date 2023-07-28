@@ -165,8 +165,8 @@ class UserController extends Controller
     public function logout_action(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
         if (Auth::check()) {
             return redirect('/dashboard')->with('failed', 'terjadi kesalahan');
         } else {

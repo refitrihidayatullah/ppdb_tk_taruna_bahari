@@ -25,6 +25,11 @@
                 <p>3. Silahkan Lakukan pengisian data periodik siswa pada menu periodik siswa. Setelah selesai maka klik button Next</p>
                 <p>4. Silahkan Lakukan pengisian data register siswa pada menu register siswa. Setelah selesai maka klik button Kirim</p>
                 <p>5. Tunggu status verifikasi dari Admin Tk Taruna Bahari. Anda bisa melihat bahwa verifikasi sudah di acc atau belum di menu dashboard status verifikasi</p>
+                @if ( $status_verifikasi->is_active === 1)
+                <p>6. Selamat data anda sudah di verifikasi, silahkan unduh Bukti pendaftaran berikut! <a class="btn btn-success btn-sm" href="{{url("/bukti_pendaftaran/".$get_bukti_pendaftaran->id_identitas_siswa)}}">Bukti Pendaftaran</a></p>
+                @else
+                    
+                @endif
             </div>
         </div>
 
@@ -83,12 +88,12 @@
                 </div>
                 @endif
     
-                @if($status_verifikasi == null || $status_verifikasi->is_active === 0 )
+                @if($status_verifikasi == null )
                 <h4 class="small font-weight-bold">Status Verifikasi<span class="float-right">0%</span></h4>
                 <div class="progress">
                     <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                @elseif( $status_register_siswa == 1 && $status_verifikasi->is_active === 0 )
+                @elseif( $status_register_siswa == 1 && $status_verifikasi->is_active == 0 )
                 <h4 class="small font-weight-bold">Status Verifikasi<span class="float-right">Menunggu di Verifikasi!</span></h4>
                 <div class="progress">
                     <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>

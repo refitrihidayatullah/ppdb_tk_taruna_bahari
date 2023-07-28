@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,8 +25,10 @@ class DashboardClient extends Controller
         $status_periodik_siswa = DB::table('tb_periodik_siswa')->where('user_id', $id_user)->count();
         $status_register_siswa = DB::table('tb_register_siswa')->where('user_id', $id_user)->count();
         $status_verifikasi = DB::table('tb_identitas_siswa')->select('is_active')->where('user_id', $id_user)->first();
+        $get_bukti_pendaftaran = DB::table('tb_identitas_siswa')->select('id_identitas_siswa')->where('user_id', $id_user)->first();
 
 
+        // dd($status_register_siswa);
         return view(
             'client.dashboard',
             [
@@ -34,6 +37,7 @@ class DashboardClient extends Controller
                 'status_periodik_siswa' => $status_periodik_siswa,
                 'status_register_siswa' => $status_register_siswa,
                 'status_verifikasi' => $status_verifikasi,
+                'get_bukti_pendaftaran' => $get_bukti_pendaftaran,
             ]
         );
     }
@@ -219,8 +223,8 @@ class DashboardClient extends Controller
                     'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 ]);
             } else {
-
-                DB::table('tb_identitas_orangtua_dua')->update([
+                $id_user = Auth::user()->id;
+                DB::table('tb_identitas_orangtua_dua')->where('user_id', $id_user)->update([
                     'nama_orangtua_dua' => $request->nama_orangtua,
                     'nik_orangtua_dua' => $request->nik_orangtua,
                     'tanggal_lahir_orangtua_dua' => $request->tanggal_lahir_orangtua,
@@ -609,5 +613,50 @@ class DashboardClient extends Controller
     {
         DB::table('tb_register_siswa')->where('id_register_siswa', $id)->delete();
         return redirect('register_siswa')->with('success', 'data berhasil dihapus');
+    }
+
+    public function cetakBuktiPendaftaran($id)
+    {
+        $get_data_user = DB::table('tb_identitas_siswa')->leftJoin('tb_identitas_orangtua', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_identitas_orangtua.identitas_siswa_id')->leftJoin('tb_identitas_orangtua_dua', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_identitas_orangtua_dua.identitas_siswa_id')->leftJoin('tb_periodik_siswa', 'tb_identitas_siswa.id_identitas_siswa', 'tb_periodik_siswa.identitas_siswa_id')->leftJoin('tb_register_siswa', 'tb_identitas_siswa.id_identitas_siswa', '=', 'tb_register_siswa.identitas_siswa_id')->where('id_identitas_siswa', $id)->select(
+            'tb_identitas_siswa.id_identitas_siswa',
+            'tb_identitas_siswa.nama_lengkap_siswa',
+            'tb_identitas_siswa.jenis_kelamin_siswa',
+            'tb_identitas_siswa.nik_siswa',
+            'tb_identitas_siswa.tempat_lahir_siswa',
+            'tb_identitas_siswa.tanggal_lahir_siswa',
+            'tb_identitas_siswa.alamat_lengkap_siswa',
+            'tb_identitas_siswa.tinggal_bersama_siswa',
+            'tb_identitas_siswa.status_anak_ke',
+            'tb_identitas_siswa.usia_siswa',
+            'tb_identitas_siswa.no_hp',
+            'tb_identitas_orangtua.nama_orangtua',
+            'tb_identitas_orangtua.nik_orangtua',
+            'tb_identitas_orangtua.tanggal_lahir_orangtua',
+            'tb_identitas_orangtua.pendidikan_orangtua',
+            'tb_identitas_orangtua.pekerjaan_orangtua',
+            'tb_identitas_orangtua_dua.nama_orangtua_dua',
+            'tb_identitas_orangtua_dua.nik_orangtua_dua',
+            'tb_identitas_orangtua_dua.tanggal_lahir_orangtua_dua',
+            'tb_identitas_orangtua_dua.pendidikan_orangtua_dua',
+            'tb_identitas_orangtua_dua.pekerjaan_orangtua_dua',
+            'tb_periodik_siswa.tinggi_badan_siswa',
+            'tb_periodik_siswa.berat_badan_siswa',
+            'tb_periodik_siswa.jarak_tempuh_siswa',
+            'tb_periodik_siswa.jumlah_saudara_siswa',
+            'tb_register_siswa.tanggal_pendaftaran_siswa',
+            'tb_register_siswa.masuk_rombel_siswa',
+            'tb_register_siswa.jenis_pendaftaran',
+            'tb_identitas_siswa.is_active',
+        )->first();
+        $path = public_path() . '/logo.png';
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $image = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        $file_name = "bukti_pendaftaran_" . $get_data_user->nama_lengkap_siswa . Carbon::now()->translatedFormat('d_F_y') . ".pdf";
+        $pdf = Pdf::loadView('pdf.bukti_pendaftaran', ['image' => $image, 'get_data_user' => $get_data_user])->setPaper('a4', 'potrate')->setWarnings(false)->save($file_name);
+
+        $response =  $pdf->download($file_name);
+        unlink(public_path() . "/" . $file_name);
+        return $response;
     }
 }

@@ -26,7 +26,7 @@ Route::post('store_login', [UserController::class, 'login_action']);
 Route::get('logout', [UserController::class, 'logout_action']);
 
 
-Route::middleware(['auth', 'user-auth'])->group(function () {
+Route::middleware(['auth',  'user-auth'])->group(function () {
     Route::get('/dashboard', [DashboardClient::class, 'index']);
     Route::get('/identitas_siswa', [DashboardClient::class, 'identitasSiswa']);
     Route::get('/identitas_siswa/{id}/edit', [DashboardClient::class, 'identitasSiswaEdit']);
@@ -50,9 +50,17 @@ Route::middleware(['auth', 'user-auth'])->group(function () {
     Route::get('/register_siswa/{id}/edit', [DashboardClient::class, 'registerSiswaEdit']);
     Route::put('/register_siswa/{id}', [DashboardClient::class, 'update_registerSiswa']);
     Route::delete('/register_siswa/{id}', [DashboardClient::class, 'destory_registerSiswa']);
+
+    Route::get('/bukti_pendaftaran/{id}', [DashboardClient::class, 'cetakBuktiPendaftaran']);
 });
 
 Route::middleware(['auth', 'admin-auth'])->group(function () {
     Route::get('/dashboard_admin', [DashboardAdmin::class, 'index']);
     Route::get('/validasi_siswa', [DashboardAdmin::class, 'validasi_siswa']);
+    Route::put('/validasi_siswa/{id}', [DashboardAdmin::class, 'update_validasi_siswa']);
+    Route::delete('/validasi_siswa/{id}', [DashboardAdmin::class, 'destroy_validasi_siswa']);
+    Route::get('/siswa_export', [DashboardAdmin::class, 'export']);
+    Route::get('/siswa_export_csv', [DashboardAdmin::class, 'exportCsv']);
+    Route::get('/siswa_export_pdf', [DashboardAdmin::class, 'exportPdf']);
+    Route::get('/siswa_pdf/{id}', [DashboardAdmin::class, 'cetakPdf']);
 });

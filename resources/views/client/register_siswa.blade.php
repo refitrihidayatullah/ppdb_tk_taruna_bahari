@@ -141,7 +141,7 @@
                  <tr>
                    <td>{{$loop->iteration}}</td>
                    <td>{{$register->id_register_siswa === null ? '':$register->nama_lengkap_siswa}}</td>
-                   <td>{{$register->tanggal_pendaftaran_siswa === null ?'':$register->tanggal_pendaftaran_siswa}}</td>
+                   <td>{{$register->tanggal_pendaftaran_siswa === null ?'':Carbon::parse($register->tanggal_pendaftaran_siswa)->translatedFormat('d F Y')}}</td>
                    <td>{{$register->masuk_rombel_siswa === null ? '':$register->masuk_rombel_siswa}}</td>
                    @if ($register->jenis_pendaftaran === null)
                        <td></td>

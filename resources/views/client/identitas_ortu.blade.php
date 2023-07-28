@@ -35,13 +35,13 @@
                       <legend class="col-form-label col-sm-2 pt-0 ">Pilih Data Diri Orang Tua:*</legend>
                       <div class="col-sm-10">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="status_orangtua" value="1" id="gridRadios1" value="option1" {{$cek_ortu1 == 1 ?'disabled':''}}>
+                          <input class="form-check-input" type="radio" name="status_orangtua" value="1" id="gridRadios1" value="option1" {{$cek_ortu1 == 1 ?'disabled': 'checked' }}>
                           <label class="form-check-label" for="gridRadios1">
                             Data Diri Ayah
                           </label>
                         </div>
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="status_orangtua" value="2" id="gridRadios2" value="option2"{{$cek_ortu1 == 0 || $cek_ortu2->nama_orangtua_dua != null ?'disabled':''}}>
+                          <input class="form-check-input" type="radio" name="status_orangtua" value="2" id="gridRadios2" value="option2"{{$cek_ortu1 == 0 || $cek_ortu2->nama_orangtua_dua != null ?'disabled':'checked'}}>
                           <label class="form-check-label" for="gridRadios2">
                             Data Diri Ibu
                           </label>
@@ -177,7 +177,15 @@
                   <td>{{ $ortu->pekerjaan_orangtua_dua ?? '' }}</td>
                   @if (is_null($ortu->id_identitas_orangtua))
                     <td></td>  
-                  @else    
+                  @elseif($count_ortu == null || $cek_ortu2->nama_orangtua_dua == null)
+                  <td>
+                  <a href="#" data-toggle="modal" data-target="#delete_identitas_ortu_Modal{{$ortu->id_identitas_orangtua}}">
+                    <span class="icon text-dark-50">
+                      <i class="fas fa-trash"></i>
+                    </span>
+                  </a>
+                </td>
+                  @else
                   <td>
                     <div class="d-flex justify-content-around">
                       <a href="{{url("/identitas_ortu/".$ortu->id_identitas_orangtua."/edit")}}">

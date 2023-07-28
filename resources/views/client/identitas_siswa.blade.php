@@ -162,7 +162,9 @@
 
 
 
-
+@php
+    use Carbon\carbon;
+@endphp
 
 
 <div class="row">
@@ -197,7 +199,7 @@
               <td>{{$identitas_siswa->nama_lengkap_siswa ?? ''}}</td>
               <td>{{$identitas_siswa->nik_siswa ?? '' }}</td>
               <td>{{$identitas_siswa->jenis_kelamin_siswa ?? ''}}</td>
-              <td>{{$identitas_siswa->tempat_lahir_siswa ?? ''}}  {{$identitas_siswa->tanggal_lahir_siswa ??''}}</td>
+              <td>{{$identitas_siswa->tempat_lahir_siswa ?? ''}}  {{Carbon::parse($identitas_siswa->tanggal_lahir_siswa)->translatedFormat('d F Y') ??''}}</td>
               <td>{{$identitas_siswa->alamat_lengkap_siswa ?? ''}}</td>
               <td>{{$identitas_siswa->tinggal_bersama_siswa ?? ''}}</td>
               <td>{{$identitas_siswa->status_anak_ke ?? ''}}</td>
